@@ -72,6 +72,11 @@ public:
 
 	bool isEmpty(); // проверка на пустоту списка
 
+	bool contains(List *list); // проверка на содержание другого списка в списке
+
+	bool contains(T data); //Проверка на содержание элемента в списке
+
+	bool is_equal(List *list); // сравнение двух списков
 	
 
 	class ListIterator : public Iterator<T>
@@ -133,6 +138,112 @@ List<T>::List()
 	size = 0;
 
 }
+
+template<typename T>
+bool List<T>::contains(List *list)
+
+{
+
+	if (list->size == 0 && size == 0)
+
+	{
+
+		return 1;
+
+	}
+
+	Node * current = head;
+
+	Node * current_find = list->head;
+
+	bool contains = false;
+
+	do {
+
+		if (current->data == current_find->data)
+
+		{
+
+			if (current_find->next == nullptr)
+
+			{
+
+				contains = true;
+
+				break;
+
+			}
+
+			current_find = current_find->next;
+
+			current = current->next;
+
+		}
+
+		else
+
+		{
+
+			contains = false;
+
+			current_find = list->head;
+
+			current = current->next;
+
+		}
+
+	} while (current != nullptr);
+
+	return contains;
+
+}
+
+template <class T>
+bool List<T>::contains(T data)
+{
+	Node * current = head;
+	bool contains = false;
+	do {
+		if (current->data == data)
+		{
+			return true;
+		}
+		current = current->next;
+	} while (current != nullptr);
+	return false;
+}
+
+template<typename T>
+bool List<T>::is_equal(List *list) {
+
+	if (size != list->size)return false;
+
+	if (size == 0 && list->size == 0) return true;
+
+	else {
+
+		Node * current = head;
+
+		Node * current1 = list->head;
+
+		while (current != tail) {
+
+			if (current->data != current1->data)return false;
+
+			current = current->next;
+
+			current1 = current1->next;
+
+		}
+
+		if (current->data != current1->data)return false;
+
+		return true;
+
+	}
+
+}
+
 
 template<typename T>
 List<T>::~List()
