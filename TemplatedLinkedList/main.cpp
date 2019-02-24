@@ -13,9 +13,9 @@ int main() {
 
 	List<double> List3;
 
-	List1.size = 0;
+	List1.set_size(0);
 
-	List2.size = 0;
+	List2.set_size(0);
 
 	List1.push_back(10);
 
@@ -40,15 +40,11 @@ int main() {
 	List3.push_back(40.4);
 
 
+	cout << List1 << endl;
 
+	cout << List2 << endl;
 
-	cout << endl;
-
-	List1.print_to_console();
-
-	List2.print_to_console();
-
-	List3.print_to_console();
+	cout << List3 << endl;
 
 	cout << endl;
 

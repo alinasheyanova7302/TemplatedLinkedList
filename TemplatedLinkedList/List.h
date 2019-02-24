@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <stdexcept>
-
+#include "Iterator.h"
 using namespace std;
 
 template<typename T>
@@ -11,6 +11,7 @@ class List
 {
 
 private:
+	size_t size;
 
 	class Node
 	{
@@ -59,11 +60,11 @@ public:
 
 	T at(size_t); // получение элемента по индексу
 
-	void f_delete(size_t); // удаление элемента по индексу
+	void remove(size_t); // удаление элемента по индексу
 
 	size_t get_size(); // получение размера списка
-
-	void print_to_console(); // вывод элементов списка в консоль через разделитель, не использовать at
+	
+	void set_size(size_t);
 
 	void clear(); // удаление всех элементов списка
 
@@ -71,19 +72,62 @@ public:
 
 	bool isEmpty(); // проверка на пустоту списка
 
-	bool contains(List *list); // проверка на содержание другого списка в списке
+	
 
-	bool is_equal(List *list); // сравнение двух списков
+	class ListIterator : public Iterator<T>
+	{
+	public:
+		ListIterator(Node* head)
+		{
+			current = head;
+		};
 
-	size_t size;
+	private:
+		T next() override;
+		bool has_next() override;
+		Node* current;
+	};
+
+	Iterator<T>* create_list_iterator();
+
+	friend std::ostream& operator<<(std::ostream& outstream, List<T>& linked_list) {
+		if (linked_list.get_size() == 0)
+			return outstream << "[nullptr]";
+		Iterator<T>* list = linked_list.create_list_iterator();
+		while (list->has_next()) {
+			outstream << "[" << list->next() << "] -> ";
+		}
+		outstream << "[NULL]" << std::endl;
+		return outstream;
+	};
 
 };
 
+template <class T>
+T List<T>::ListIterator::next()
+{
+	if (!current) return T();
+	const T data = current->data;
+	current = current->next;
+	return data;
+}
+
+template <class T>
+bool List<T>::ListIterator::has_next()
+{
+	return (current != nullptr);
+}
+
+template <class T>
+Iterator<T>* List<T>::create_list_iterator()
+{
+	if (this == nullptr && this->head == nullptr) throw std::exception("Does not exist");
+	return new ListIterator(this->head);
+}
+
 template<typename T>
 List<T>::List()
-
 {
-
 	reset_list();
 
 	size = 0;
@@ -98,37 +142,6 @@ List<T>::~List()
 	cout << "¬ызвалс€ деструктор!" << endl;
 
 	clear();
-
-}
-
-template<typename T>
-bool List<T>::is_equal(List *list) {
-
-	if (size != list->size)return false;
-
-	if (size == 0 && list->size == 0) return true;
-
-	else {
-
-		Node * current = head;
-
-		Node * current1 = list->head;
-
-		while (current != tail) {
-
-			if (current->data != current1->data)return false;
-
-			current = current->next;
-
-			current1 = current1->next;
-
-		}
-
-		if (current->data != current1->data)return false;
-
-		return true;
-
-	}
 
 }
 
@@ -201,6 +214,11 @@ void List<T>::add_first(T newElem)
 
 	tail = head;
 
+}
+
+template<typename T>
+void List<T>::set_size(size_t size) {
+	this->size = size;
 }
 
 template<typename T>
@@ -395,7 +413,7 @@ T List<T>::at(size_t index)
 }
 
 template<typename T>
-void List<T>::f_delete(size_t index)
+void List<T>::remove(size_t index)
 
 {
 
@@ -469,37 +487,6 @@ size_t List<T>::get_size()
 }
 
 template<typename T>
-void List<T>::print_to_console()
-
-{
-
-	if (size == 0)
-
-	{
-
-		cout << "—писок пустой!" << endl;
-
-		return;
-
-	}
-
-	Node * current = head;
-
-	while (current != NULL)
-
-	{
-
-		cout << current->data << " -> ";
-
-		current = current->next;
-
-	}
-
-	cout << " |X| "<< endl;
-
-}
-
-template<typename T>
 void List<T>::set(size_t index, T newElem)
 
 {
@@ -553,61 +540,3 @@ bool List<T>::isEmpty()
 
 }
 
-template<typename T>
-bool List<T>::contains(List *list)
-
-{
-
-	if (list->size == 0 && size == 0)
-
-	{
-
-		return 1;
-
-	}
-
-	Node * current = head;
-
-	Node * current_find = list->head;
-
-	bool contains = false;
-
-	do {
-
-		if (current->data == current_find->data)
-
-		{
-
-			if (current_find->next == nullptr)
-
-			{
-
-				contains = true;
-
-				break;
-
-			}
-
-			current_find = current_find->next;
-
-			current = current->next;
-
-		}
-
-		else
-
-		{
-
-			contains = false;
-
-			current_find = list->head;
-
-			current = current->next;
-
-		}
-
-	} while (current != nullptr);
-
-	return contains;
-
-}
