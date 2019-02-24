@@ -50,35 +50,35 @@ public:
 
 	void add_first(T newElem);
 
-	void push_back(T); // добавление в конец списка
+	void push_back(T); // add to end of list
 
-	void push_front(T); // добавление в начало списка
+	void push_front(T); // adding to the top of the list
 
-	void pop_back(); // удаление последнего элемента
+	void pop_back(); // delete last item
 
-	void pop_front(); // удаление первого элемента
+	void pop_front(); // delete first item
 
-	void insert(T, size_t); // добавление элемента по индексу
+	void insert(T, size_t); // add item by index
 
-	T at(size_t); // получение элемента по индексу
+	T at(size_t); // getting item by index
 
-	void remove(size_t); // удаление элемента по индексу
+	void remove(size_t); // delete item by index
 
-	size_t get_size(); // получение размера списка
+	size_t get_size(); // getting list size
 	
-	void set_size(size_t);
+	void set_size(size_t); //setting list size
 
-	void clear(); // удаление всех элементов списка
+	void clear(); // delete all list items
 
-	void set(size_t, T); // замена элемента по индексу на передаваемый элемент
+	void set(size_t, T); // replacing an item by index with a passed item
 
-	bool isEmpty(); // проверка на пустоту списка
+	bool isEmpty(); // check for empty list
 
-	bool contains(List *list); // проверка на содержание другого списка в списке
+	bool contains(List *list); // check for the contents of another list in the list
 
-	bool contains(T data); //ѕроверка на содержание элемента в списке
+	bool contains(T data); // check for the content of an item in the list
 
-	bool is_equal(List *list); // сравнение двух списков
+	bool is_equal(List *list); // comparing two lists
 	
 
 	class ListIterator : public Iterator<T>
@@ -143,8 +143,6 @@ List<T>::List()
 	size = 0;
 
 }
-
-
 
 
 template<typename T>
