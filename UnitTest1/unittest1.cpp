@@ -40,7 +40,10 @@ namespace UnitTest1
 			list.push_back(3);
 			list.push_back(4);
 
-			Assert::IsTrue(list.at(0) == 1 && list.at(1) == 2 && list.at(2) == 3 && list.at(3) == 4);
+			Assert::IsTrue(list.at(1) == 1
+				&& list.at(2) == 2
+				&& list.at(3) == 3
+				&& list.at(4) == 4);
 		}
 
 		TEST_METHOD(at_empty)
@@ -48,11 +51,11 @@ namespace UnitTest1
 			try {
 				List<int> list;
 
-				Assert::IsTrue(list.at(0) == 1);
+				Assert::IsTrue(list.at(1) == 1);
 			}
 			catch (std::out_of_range o_ex)
 			{
-				Assert::AreEqual(o_ex.what(), "Index is greater than list size");
+				Assert::AreEqual(o_ex.what(), "Индекс больше размера списка");
 			}
 		}
 		//push back
@@ -68,7 +71,7 @@ namespace UnitTest1
 		{
 			List<int> list;
 			list.push_back(1);
-			Assert::IsTrue(list.at(0) == 1 && list.get_size() == 1);
+			Assert::IsTrue(list.at(1) == 1 && list.get_size() == 1);
 		}
 
 		TEST_METHOD(push_back_is_valid_2)
@@ -78,7 +81,7 @@ namespace UnitTest1
 			list.push_front(1);
 			list.push_back(3);
 			list.push_back(4);
-			Assert::IsTrue(list.at(3) == 4); // 1 2 3 4
+			Assert::IsTrue(list.at(4) == 4); // 1 2 3 4
 		}
 
 		TEST_METHOD(push_front_is_valid_1)
@@ -88,7 +91,7 @@ namespace UnitTest1
 			list.push_front(1);
 			list.push_back(3);
 			list.push_back(4);
-			Assert::IsTrue(list.at(0) == 1); // 1 2 3 4
+			Assert::IsTrue(list.at(1) == 1); // 1 2 3 4
 		}
 
 		TEST_METHOD(push_front_is_valid_2)
@@ -96,7 +99,7 @@ namespace UnitTest1
 			List<int> list;
 			list.push_front(1);
 
-			Assert::IsTrue(list.at(0) == 1 && list.get_size() == 1);
+			Assert::IsTrue(list.at(1) == 1 && list.get_size() == 1);
 		}
 
 		TEST_METHOD(equals_true)
@@ -213,7 +216,7 @@ namespace UnitTest1
 			List<int> list2;
 			list2.push_back(1);
 
-			list1.insert(0, 1);
+			list1.insert(1, 1);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}
@@ -245,7 +248,7 @@ namespace UnitTest1
 			list2.push_back(3);
 			list2.push_back(4);
 
-			list1.insert(1, 2);
+			list1.insert(2, 2);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}
@@ -264,7 +267,7 @@ namespace UnitTest1
 			list2.push_back(3);
 			list2.push_back(4);
 
-			list1.insert(0, 1);
+			list1.insert(1, 1);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}
@@ -281,7 +284,7 @@ namespace UnitTest1
 			list2.push_back(3);
 			list2.push_back(4);
 
-			list1.insert(3, 4);
+			list1.insert(4, 4);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}
@@ -296,7 +299,7 @@ namespace UnitTest1
 			}
 			catch (std::out_of_range o_ex)
 			{
-				Assert::AreEqual(o_ex.what(), "Index is greater than list size");
+				Assert::AreEqual(o_ex.what(), "Индекс больше размера списка");
 			}
 		}
 		TEST_METHOD(remove_back)
@@ -312,7 +315,7 @@ namespace UnitTest1
 			list2.push_back(2);
 			list2.push_back(3);
 
-			list1.remove(3);
+			list1.remove(4);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}
@@ -330,10 +333,11 @@ namespace UnitTest1
 			list2.push_back(3);
 			list2.push_back(4);
 
-			list1.remove(0);
+			list1.remove(1);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}
+
 		TEST_METHOD(remove)
 		{
 			List<int> list1;
@@ -347,7 +351,7 @@ namespace UnitTest1
 			list2.push_back(2);
 			list2.push_back(4);
 
-			list1.remove(2);
+			list1.remove(3);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}
@@ -389,7 +393,7 @@ namespace UnitTest1
 			list2.push_back(1);
 			list2.push_back(2);
 
-			list1.set(1, 2);
+			list1.set(2, 2);
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}

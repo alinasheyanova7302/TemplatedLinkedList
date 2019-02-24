@@ -144,7 +144,7 @@ bool List<T>::contains(List *list)
 
 {
 
-	if (list->size == 0 && size == 0)
+	if (list->size == 0)
 
 	{
 
