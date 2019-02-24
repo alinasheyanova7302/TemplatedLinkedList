@@ -55,7 +55,7 @@ namespace UnitTest1
 			}
 			catch (std::out_of_range o_ex)
 			{
-				Assert::AreEqual(o_ex.what(), "Индекс больше размера списка");
+				Assert::AreEqual(o_ex.what(), "index is larger than list size");
 			}
 		}
 		//push back
@@ -231,7 +231,7 @@ namespace UnitTest1
 			}
 			catch (std::out_of_range o_ex)
 			{
-				Assert::AreEqual(o_ex.what(), "Index is greater than list size and more than the index for teoretical last element");
+				Assert::AreEqual(o_ex.what(), "index is larger than list size");
 			}
 		}
 
@@ -299,7 +299,7 @@ namespace UnitTest1
 			}
 			catch (std::out_of_range o_ex)
 			{
-				Assert::AreEqual(o_ex.what(), "Индекс больше размера списка");
+				Assert::AreEqual(o_ex.what(), "index is larger than list size");
 			}
 		}
 		TEST_METHOD(remove_back)

@@ -30,7 +30,9 @@ private:
 
 		};
 
-		~Node() {};
+		~Node() {
+		
+		};
 
 	};
 
@@ -97,7 +99,7 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& outstream, List<T>& linked_list) {
 		if (linked_list.get_size() == 0)
-			return outstream << "[nullptr]";
+			return outstream << "[NULL]";
 		Iterator<T>* list = linked_list.create_list_iterator();
 		while (list->has_next()) {
 			outstream << "[" << list->next() << "] -> ";
@@ -117,11 +119,13 @@ T List<T>::ListIterator::next()
 	return data;
 }
 
+
 template <class T>
 bool List<T>::ListIterator::has_next()
 {
 	return (current != nullptr);
 }
+
 
 template <class T>
 Iterator<T>* List<T>::create_list_iterator()
@@ -129,6 +133,7 @@ Iterator<T>* List<T>::create_list_iterator()
 	if (this == nullptr && this->head == nullptr) throw std::exception("Does not exist");
 	return new ListIterator(this->head);
 }
+
 
 template<typename T>
 List<T>::List()
@@ -139,10 +144,13 @@ List<T>::List()
 
 }
 
+
+
+
 template<typename T>
 bool List<T>::contains(List *list)
 
-{
+{  
 
 	if (list->size == 0)
 
@@ -151,6 +159,7 @@ bool List<T>::contains(List *list)
 		return 1;
 
 	}
+
 
 	Node * current = head;
 
@@ -249,8 +258,6 @@ template<typename T>
 List<T>::~List()
 
 {
-
-	cout << "Вызвался деструктор!" << endl;
 
 	clear();
 
@@ -450,7 +457,7 @@ void List<T>::insert(T newElem, size_t index) {
 
 	if (index > size + 1) {
 
-		throw std::out_of_range("Индекс больше размера списка");
+		throw std::out_of_range("index is larger than list size");
 
 	}
 
@@ -496,7 +503,7 @@ T List<T>::at(size_t index)
 
 	if (index >= size + 1) {
 
-		throw out_of_range("Индекс больше размера списка");
+		throw out_of_range("index is larger than list size");
 
 
 	}
@@ -532,7 +539,7 @@ void List<T>::remove(size_t index)
 
 	{
 
-		throw std::out_of_range("Индекс больше размера списка");
+		throw std::out_of_range("index is larger than list size");
 
 		return;
 
@@ -606,9 +613,8 @@ void List<T>::set(size_t index, T newElem)
 
 	{
 
-		throw out_of_range("Индекс больше размера списка");
+		throw out_of_range("index is larger than list size");
 
-		//cout << "Индекс превышает размер, попробуйте еще раз!" << endl;
 
 		return;
 

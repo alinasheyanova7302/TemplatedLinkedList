@@ -5,7 +5,6 @@
 using namespace std;
 
 int main() {
-	setlocale(LC_ALL, "rus");
 
 	List<int> List1;
 
@@ -16,6 +15,8 @@ int main() {
 	List1.set_size(0);
 
 	List2.set_size(0);
+
+	List3.set_size(0);
 
 	List1.push_back(10);
 
@@ -38,6 +39,7 @@ int main() {
 	List3.push_back(30.3);
 
 	List3.push_back(40.4);
+
 
 
 	cout << List1 << endl;
