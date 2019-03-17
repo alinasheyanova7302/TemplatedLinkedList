@@ -58,8 +58,7 @@ namespace UnitTest1
 				Assert::AreEqual(o_ex.what(), "index is larger than list size");
 			}
 		}
-		//push back
-
+		
 		TEST_METHOD(LinkedList_isEmpty_false)
 		{
 			List<int> list;
@@ -115,6 +114,23 @@ namespace UnitTest1
 			list2.push_back(2);
 			list2.push_back(3);
 			list2.push_back(4);
+
+			Assert::IsTrue(list1.is_equal(&list2));
+		}
+
+		TEST_METHOD(equals_true_char)
+		{
+			List<char> list1;
+			list1.push_back('o');
+			list1.push_back('a');
+			list1.push_back('t');
+			list1.push_back('c');
+
+			List<char> list2;
+			list2.push_back('o');
+			list2.push_back('a');
+			list2.push_back('t');
+			list2.push_back('c');
 
 			Assert::IsTrue(list1.is_equal(&list2));
 		}

@@ -428,7 +428,7 @@ void List<T>::pop_front()
 
 	if (size == 1) {
 
-		delete head;
+		//delete head;
 
 		reset_list();
 
@@ -442,7 +442,7 @@ void List<T>::pop_front()
 
 		head = head->next;
 
-		delete current;
+		//delete current;
 
 	}
 
@@ -507,8 +507,6 @@ T List<T>::at(size_t index)
 	}
 
 	else {
-
-		index--;
 
 		size_t counter = 0;
 
