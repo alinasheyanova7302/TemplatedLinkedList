@@ -1,271 +1,447 @@
 #pragma once
+#include <iostream>
 #include "../TemplatedLinkedList/List.h"
 #include "../TemplatedLinkedList/Iterator.h"
 using namespace std;
 
-template <class Key, class Value> class Map;
+enum Color { R, B };
 
-template <class Key, class Value> class node
+template<class Key, class Value> //Key - key type, Value - value type
+struct Node
 {
-private:
 	Key key;
 	Value value;
-	node *father;
-	node *left;
-	node *right;
 	bool color;
+	Node* left, *right, *parent;
 
-	node(Key key, Value value)
+	Node(Key key, Value value)
 	{
 		this->key = key;
 		this->value = value;
-		left = nullptr;
-		right = nullptr;
-		father = nullptr;
-		color = true;
+		color = R;
+		left = right = parent = nullptr;
 	}
-	friend Map<Key, Value>;
 };
 
-template <class Key, class Value> class Map
+template<class Key, class Value> //Key - key type, Value - value type
+class Map
 {
-	node<Key, Value> *root;
-	size_t size(node<Key, Value>*);
-	void rotate_left(node<Key, Value>*);
-	void rotate_right(node<Key, Value>*);
-	void insert_fix(node<Key, Value>*);
-	node<Key, Value>* successor(node<Key, Value>*);
-	void delete_fix(node<Key, Value>*);
-	node<Key, Value>* node_find(Key key);
-	void tree_delete(node<Key, Value>*);
-	class SftIterator : public Iterator<node<Key, Value> *>
+private:
+	Node<Key, Value>* root;
+	int size;
+protected:
+	void rotateLeft(Node<Key, Value>*&);
+	void rotateRight(Node<Key, Value>*&);
+	void fixInsertRBTree(Node<Key, Value>*&);
+	void fixDeleteRBTree(Node<Key, Value>*&);
+	static bool getColor(Node<Key, Value>*&);
+	static void setColor(Node<Key, Value>*&, bool);
+	static Node<Key, Value>* minValueNode(Node<Key, Value>*);
+	static Node<Key, Value>* maxValueNode(Node<Key, Value>*);
+	Node<Key, Value>* insertBST(Node<Key, Value>*, Node<Key, Value>*);
+	Node<Key, Value>* deleteBST(Node<Key, Value>*, Key);
+	int getBlackHeight(Node<Key, Value>*);
+	void tree_delete(Node<Key, Value>*);
+	Node<Key, Value>* node_find(Node<Key, Value>*, Key);
+
+	class SftIterator : public Iterator<Node<Key, Value>*>
 	{
 	public:
-		SftIterator(node < Key, Value> * root)
+		SftIterator(Node < Key, Value>* root)
 		{
 			current = root;
 		};
 
 	private:
-		node<Key, Value>* next() override;
+		Node<Key, Value>* next() override;
 		bool has_next() override
 		{
 			return (list.get_size() || current != nullptr);
 		};
-		List<node<Key, Value>*> list;
-		node<Key, Value> * current;
+		List<Node<Key, Value>*> list;
+		Node<Key, Value>* current;
 	};
-	Iterator<node<Key, Value> *>* create_sft_iterator() const
+	Iterator<Node<Key, Value>*>* create_sft_iterator() const
 	{
 		if (this == nullptr && this->root == nullptr) throw std::exception("Map does not exist");
 		return new SftIterator(this->root);
 	};
 public:
-	size_t size()
-	{
-		return size(root);
-	};
-
-	Map() { root = nullptr; };
+	Map() { root = nullptr; size = 0; };
 	~Map() { clear(); }
-	void insert(Key key, Value value);
+	size_t getSize()
+	{
+		return size;
+	};
+	void insert(Key key, Value value); //insert key and value to map, or replace value by key
 	void remove(Key);
-	Value find(Key);
-	bool contains(Key key);
+	Value find(Key); //return nullptr if not find
+	bool isContainedIn(Key key);
+	void clear(); //clear whole map
 	List<Key> getKeys();
 	List<Value> getValues();
-	void clear();
-
 };
 
 template <class Key, class Value>
-void Map<Key, Value>::insert(Key key, Value value) {
-	node<Key, Value> *create = new node<Key, Value>(key, value);
-	node<Key, Value> *p = root;
-	node<Key, Value> *q = nullptr;
-	if (root == nullptr)
-	{
-		root = create;
-		create->father = nullptr;
-	}
-	else
-	{
-		while (p != nullptr)
-		{
-			q = p;
-			if (p->key > create->key) p = p->left;
-			else if (p->key < create->key) p = p->right;
-			else {
-				p->value = value;
-				return;
-			};
-		}
-		create->father = q;
-		if (q->key < create->key) q->right = create;
-		else if (q->key > create->key)q->left = create;
-		else return;
-	}
-	insert_fix(create);
-}
-
-template<class Key, class Value>
-void Map<Key, Value>::insert_fix(node<Key, Value> *p)
+void Map<Key, Value>::rotateLeft(Node<Key, Value>*& node)
 {
-	node<Key, Value> *x = p;
-	while (x != root && x->father->color)
-	{
-		if (x->father == x->father->father->left)
-		{
-			node<Key, Value> *y = x->father->father->right;
-			if ((y != nullptr) && (y->color))
-			{
-				x->father->color = 0;
-				y->color = 0;
-				x->father->father->color;
-				x = x->father->father;
-			}
-			else
-			{
-				if (x->father->right == x)
-				{
-					x = x->father;
-					rotate_left(x);
-				}
-				x->father->color = 0;
-				x->father->father->color = 1;
-				rotate_right(x->father->father);
-			}
-		}
-		else
-		{
-			node<Key, Value> *y = x->father->father->left;
-			if ((y != nullptr) && (y->color))
-			{
-				x->father->color = 0;
-				y->color = 0;
-				x->father->father->color = 1;
-				x = x->father->father;
-			}
-			else
-			{
-				if (x->father->left == x)
-				{
-					x = x->father;
-					rotate_right(x);
-				}
-				x->father->color = 0;
-				x->father->father->color = 1;
-				rotate_left(x->father->father);
-			}
-		}
-	}
-	root->color = 0;
-}
+	Node<Key, Value>* right_child = node->right;
+	node->right = right_child->left;
 
-template<class Key, class Value>
-void Map<Key, Value>::rotate_right(node<Key, Value>* y)
-{
-	if (y->left == nullptr)
-		return;
-	node<Key, Value> *x = y->left;
-	node<Key, Value> *b = x->right;
-	node<Key, Value> *f = y->father;
-	if (f == nullptr)
-	{
-		x->father = nullptr;
-		root = x;
-	}
+	if (node->right != nullptr)
+		node->right->parent = node;
+
+	right_child->parent = node->parent;
+
+	if (node->parent == nullptr)
+		root = right_child;
+	else if (node == node->parent->left)
+		node->parent->left = right_child;
 	else
-	{
-		x->father = f;
-		if (f->left == y)
-			f->left = x;
-		if (f->right == y)
-			f->right = x;
-	}
-	x->right = y;
-	y->father = x;
-	y->left = b;
-	if (b != nullptr)
-		b->father = y;
+		node->parent->right = right_child;
+
+	right_child->left = node;
+	node->parent = right_child;
 }
 
 template <class Key, class Value>
-void Map<Key, Value>::rotate_left(node<Key, Value>* x)
+void Map<Key, Value>::rotateRight(Node<Key, Value> * &node)
 {
-	if (x->right == nullptr)
-		return;
-	node<Key, Value> *y = x->right;
-	node<Key, Value> *b = y->left;
-	node<Key, Value> *f = x->father;
-	if (f == nullptr)
-	{
-		y->father = nullptr;
-		root = y;
-	}
+	Node<Key, Value>* left_child = node->left;
+	node->left = left_child->right;
+
+	if (node->left != nullptr)
+		node->left->parent = node;
+
+	left_child->parent = node->parent;
+
+	if (node->parent == nullptr)
+		root = left_child;
+	else if (node == node->parent->left)
+		node->parent->left = left_child;
 	else
-	{
-		y->father = f;
-		if (f->left == x)
-			f->left = y;
-		if (f->right == x)
-			f->right = y;
-	}
-	y->left = x;
-	x->father = y;
-	x->right = b;
-	if (b != nullptr)
-		b->father = x;
+		node->parent->right = left_child;
+
+	left_child->right = node;
+	node->parent = left_child;
 }
-template<class Key, class Value>
-node<Key, Value>* Map<Key, Value>::node_find(Key key)
+
+template <class Key, class Value>
+void Map<Key, Value>::fixInsertRBTree(Node<Key, Value> * &node)
 {
-	node<Key, Value> *t = root;
-	while (t != nullptr)
-	{
-		if (t->key == key)
-			break;
-		if (key > t->key)
-			t = t->right;
-		else if (key < t->key)
-			t = t->left;
+	Node<Key, Value>* parent = nullptr;
+	Node<Key, Value>* grandparent = nullptr;
+	while (node != root && getColor(node) == R && getColor(node->parent) == R) {
+		parent = node->parent;
+		grandparent = parent->parent;
+		if (parent == grandparent->left) {
+			Node<Key, Value>* uncle = grandparent->right;
+			if (getColor(uncle) == R) {
+				setColor(uncle, B);
+				setColor(parent, B);
+				setColor(grandparent, R);
+				node = grandparent;
+			}
+			else {
+				if (node == parent->right) {
+					rotateLeft(parent);
+					node = parent;
+					parent = node->parent;
+				}
+				rotateRight(grandparent);
+				swap(parent->color, grandparent->color);
+				node = parent;
+			}
+		}
+		else {
+			Node<Key, Value>* uncle = grandparent->left;
+			if (getColor(uncle) == R) {
+				setColor(uncle, B);
+				setColor(parent, B);
+				setColor(grandparent, R);
+				node = grandparent;
+			}
+			else {
+				if (node == parent->left) {
+					rotateRight(parent);
+					node = parent;
+					parent = node->parent;
+				}
+				rotateLeft(grandparent);
+				swap(parent->color, grandparent->color);
+				node = parent;
+			}
+		}
 	}
-	if (t == nullptr)
+	setColor(root, B);
+}
+
+template <class Key, class Value>
+void Map<Key, Value>::fixDeleteRBTree(Node<Key, Value> * &node)
+{
+	if (node == nullptr)
+		return;
+
+	if (node == root) {
+		root = nullptr;
+		size--;
+		return;
+	}
+
+	if (getColor(node) == R || getColor(node->left) == R || getColor(node->right) == R) {
+		Node<Key, Value>* child = node->left != nullptr ? node->left : node->right;
+
+		if (node == node->parent->left) {
+			node->parent->left = child;
+			if (child != nullptr)
+				child->parent = node->parent;
+			setColor(child, B);
+			delete (node);
+			size--;
+		}
+		else {
+			node->parent->right = child;
+			if (child != nullptr)
+				child->parent = node->parent;
+			setColor(child, B);
+			delete (node);
+			size--;
+		}
+	}
+	else {
+		Node<Key, Value>* sibling = nullptr;
+		Node<Key, Value>* parent = nullptr;
+		Node<Key, Value>* temp = node;
+		//setColor(node, DOUBLE_BLACK);
+		while (temp != root && /*getColor(node) == DOUBLE_BLACK*/ temp->right == nullptr && temp->left == nullptr) { // check if not root and while leaf (both == nullprt)
+			parent = temp->parent;
+			if (temp == parent->left) {
+				sibling = parent->right;
+				if (getColor(sibling) == R) {
+					setColor(sibling, B);
+					setColor(parent, R);
+					rotateLeft(parent);
+				}
+				else {
+					if (getColor(sibling->left) == B && getColor(sibling->right) == B) {
+						setColor(sibling, R);
+						if (getColor(parent) == R)
+							setColor(parent, B);
+						temp = parent;
+					}
+					else {
+						if (getColor(sibling->right) == B) {
+							setColor(sibling->left, B);
+							setColor(sibling, R);
+							rotateRight(sibling);
+							sibling = parent->right;
+						}
+						setColor(sibling, parent->color);
+						setColor(parent, B);
+						setColor(sibling->right, B);
+						rotateLeft(parent);
+						break;
+					}
+				}
+			}
+			else {
+				sibling = parent->left;
+				if (getColor(sibling) == R) {
+					setColor(sibling, B);
+					setColor(parent, R);
+					rotateRight(parent);
+				}
+				else {
+					if (getColor(sibling->left) == B && getColor(sibling->right) == B) {
+						setColor(sibling, R);
+						if (getColor(parent) == R)
+							setColor(parent, B);
+						temp = parent;
+					}
+					else {
+						if (getColor(sibling->left) == B) {
+							setColor(sibling->right, B);
+							setColor(sibling, R);
+							rotateLeft(sibling);
+							sibling = parent->left;
+						}
+						setColor(sibling, parent->color);
+						setColor(parent, B);
+						setColor(sibling->left, B);
+						rotateRight(parent);
+						break;
+					}
+				}
+			}
+		}
+		if (node == node->parent->left)
+			node->parent->left = nullptr;
+		else
+			node->parent->right = nullptr;
+		delete(node);
+		size--;
+		setColor(root, B);
+	}
+}
+
+template <class Key, class Value>
+bool Map<Key, Value>::getColor(Node<Key, Value> * &node)
+{
+	if (node == nullptr)
+		return B;
+
+	return node->color;
+}
+
+template <class Key, class Value>
+void Map<Key, Value>::setColor(Node<Key, Value> * &node, bool color)
+{
+	if (node == nullptr)
+		return;
+
+	node->color = color;
+}
+
+template <class Key, class Value>
+Node<Key, Value>* Map<Key, Value>::minValueNode(Node<Key, Value> * node) {
+	while (node->left != nullptr)
+		node = node->left;
+	return node;
+}
+
+template <class Key, class Value>
+Node<Key, Value>* Map<Key, Value>::maxValueNode(Node<Key, Value> * node)
+{
+	while (node->right != nullptr)
+		node = node->right;
+	return node;
+}
+
+template <class Key, class Value>
+Node<Key, Value>* Map<Key, Value>::insertBST(Node<Key, Value> * root, Node<Key, Value> * node)
+{
+	if (root == nullptr) {
+		size++;
+		return node;
+	}
+
+	if (root->key > node->key) {
+		root->left = insertBST(root->left, node);
+		root->left->parent = root;
+	}
+	else if (root->key < node->key) {
+		root->right = insertBST(root->right, node);
+		root->right->parent = root;
+	}
+	else if (root->key == node->key) {
+		root->value = node->value;
+	}
+
+	return root;
+}
+
+template <class Key, class Value>
+Node<Key, Value>* Map<Key, Value>::deleteBST(Node<Key, Value> * root, Key key)
+{
+	if (root == nullptr) {
+		return root;
+	}
+
+	if (key < root->key)
+		return deleteBST(root->left, key);
+
+	if (key > root->key)
+		return deleteBST(root->right, key);
+
+	if (root->left == nullptr || root->right == nullptr)
+		return root;
+
+	Node<Key, Value> * temp = minValueNode(root->right);
+	root->key = temp->key;
+	root->value = temp->value;
+	return deleteBST(root->right, temp->key);
+}
+
+template <class Key, class Value>
+int Map<Key, Value>::getBlackHeight(Node<Key, Value> * node)
+{
+	int count = 0;
+	while (node != nullptr) {
+		if (getColor(node) == B)
+			count++;
+		node = node->left;
+	}
+	return count;
+}
+
+template <class Key, class Value>
+void Map<Key, Value>::tree_delete(Node<Key, Value> * node)
+{
+	if (node == nullptr) return;
+	tree_delete(node->left);
+	tree_delete(node->right);
+	delete node;
+	size--;
+}
+
+template <class Key, class Value>
+Node<Key, Value>* Map<Key, Value>::node_find(Node<Key, Value> * node, Key key)
+{
+	if (node == nullptr)
 		return nullptr;
-	if (t->key == key)
-		return t;
+	if (key < node->key)
+		return node_find(node->left, key);
+	if (key > node->key)
+		return node_find(node->right, key);
+	if (node->key == key)
+		return node;
 	return nullptr;
 }
 
 template <class Key, class Value>
-void Map<Key, Value>::tree_delete(node<Key, Value> * p)
-{
-	if (p == nullptr) return;
-	tree_delete(p->left);
-	tree_delete(p->right);
-	free(p);
-}
-
-template <class Key, class Value>
-node<Key, Value>* Map<Key, Value>::SftIterator::next()
+Node<Key, Value> * Map<Key, Value>::SftIterator::next()
 {
 	while (current != nullptr) {
 		list.push_front(current);
 		current = current->left;
 	}
-	current = list.at((size_t)0);
+	current = list.at(0);
 	list.pop_front();
-	auto p = current;
+	auto temp = current;
 	current = current->right;
-	return p;
+	return temp;
 }
 
 template <class Key, class Value>
-bool Map<Key, Value>::contains(Key key)
+void Map<Key, Value>::insert(Key key, Value value)
 {
-	node<Key, Value> *t = node_find(key);
-	if (t == nullptr) return false;
-	return t->key == key;
+	auto* node = new Node<Key, Value>(key, value);
+	root = insertBST(root, node);
+	fixInsertRBTree(node);
+}
+
+template <class Key, class Value>
+void Map<Key, Value>::remove(Key key)
+{
+	Node<Key, Value>* node = deleteBST(root, key);
+	fixDeleteRBTree(node);
+}
+
+template <class Key, class Value>
+Value Map<Key, Value>::find(Key key)
+{
+	Node<Key, Value>* temp = node_find(root, key);
+	if (temp == nullptr)
+		return {};
+	return temp->value;
+}
+
+template <class Key, class Value>
+bool Map<Key, Value>::isContainedIn(Key key)
+{
+	Node<Key, Value>* temp = node_find(root, key);
+	if (temp == nullptr) return false;
+	return temp->key == key;
 }
 
 template <class Key, class Value>
@@ -279,7 +455,7 @@ template <class Key, class Value>
 List<Key> Map<Key, Value>::getKeys()
 {
 	List<Key> keys;
-	if (this->size() != 0) {
+	if (this->getSize() != 0) {
 		auto* iterator = this->create_sft_iterator();
 		while (iterator->has_next())
 		{
@@ -293,7 +469,7 @@ template <class Key, class Value>
 List<Value> Map<Key, Value>::getValues()
 {
 	List<Value> values;
-	if (this->size() != 0) {
+	if (this->getSize() != 0) {
 		auto* iterator = this->create_sft_iterator();
 		while (iterator->has_next())
 		{
@@ -301,174 +477,4 @@ List<Value> Map<Key, Value>::getValues()
 		}
 	}
 	return values;
-}
-
-template <class Key, class Value>
-Value Map<Key, Value>::find(Key key)
-{
-	node<Key, Value> *t = node_find(key);
-	if (t == nullptr)
-		return {};
-	return t->value;
-}
-
-template<class Key, class Value>
-size_t Map<Key, Value>::size(node<Key, Value> * p)
-{
-	if (p == nullptr) return 0;
-	return size(p->left) + size(p->right) + 1;
-}
-
-template<class Key, class Value>
-node<Key, Value>* Map<Key, Value>::successor(node<Key, Value> *p)
-{
-	node<Key, Value> *y;
-	if (p->left != nullptr)
-	{
-		y = p->left;
-		while (y->right != nullptr)
-			y = y->right;
-	}
-	else
-	{
-		y = p->right;
-		while (y->left != nullptr)
-			y = y->left;
-	}
-	return y;
-}
-
-template <class Key, class Value>
-void Map<Key, Value>::remove(Key key)
-{
-	if (root == nullptr)
-	{
-		return;
-	}
-	node<Key, Value> *p = root;
-	node<Key, Value> *y;
-	node<Key, Value> *q;
-	bool found = false;
-	while (p != nullptr && !found)
-	{
-		if (p->key == key)
-			found = true;
-		if (!found)
-		{
-			if (p->key < key)
-				p = p->right;
-			else
-				p = p->left;
-		}
-	}
-	if (!found)
-		return;
-	if (p->left == nullptr || p->right == nullptr)
-		y = p;
-	else
-		y = successor(p);
-	if (y->left != nullptr)
-		q = y->left;
-	else
-	{
-		if (y->right != nullptr)
-			q = y->right;
-		else
-			q = nullptr;
-	}
-	if (q != nullptr)
-		q->father = y->father;
-	if (y->father == nullptr)
-		root = q;
-	else
-	{
-		if (y == y->father->left)
-			y->father->left = q;
-		else
-			y->father->right = q;
-	}
-	if (y != p)
-	{
-		p->color = y->color;
-		p->key = y->key;
-		p->value = y->value;
-	}
-	if (y->color == 0)
-		delete_fix(q);
-}
-
-template <class Key, class Value>
-void Map<Key, Value>::delete_fix(node<Key, Value> *p)
-{
-	if (p != nullptr)
-	{
-		node<Key, Value> *s;
-		while (p != root && !p->color)
-		{
-			if (p->father->left == p)
-			{
-				s = p->father->right;
-				if (s->color == 1)
-				{
-					s->color = 0;
-					p->father->color = 1;
-					rotate_left(p->father);
-					s = p->father->right;
-				}
-				if (!s->right->color && !s->left->color)
-				{
-					s->color = 1;
-					p = p->father;
-				}
-				else
-				{
-					if (!s->right->color)
-					{
-						s->left->color = 0;
-						s->color = 1;
-						rotate_right(s);
-						s = p->father->right;
-					}
-					s->color = p->father->color;
-					p->father->color = 0;
-					s->right->color = 0;
-					rotate_left(p->father);
-					p = root;
-				}
-			}
-			else
-			{
-				s = p->father->left;
-				if (s->color)
-				{
-					s->color = 1;
-					p->father->color = 1;
-					rotate_right(p->father);
-					s = p->father->left;
-				}
-				if (!s->left->color && !s->right->color)
-				{
-					s->color = 1;
-					p = p->father;
-				}
-				else
-				{
-					if (!s->left->color)
-					{
-						s->right->color = 0;
-						s->color = 1;
-						rotate_left(s);
-						s = p->father->left;
-					}
-					s->color = p->father->color;
-					p->father->color = 0;
-					s->left->color = 0;
-					rotate_right(p->father);
-					p = root;
-				}
-			}
-			p->color = 0;
-			root->color = 0;
-		}
-	}
 }
