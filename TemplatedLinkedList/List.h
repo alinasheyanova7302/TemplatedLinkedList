@@ -79,7 +79,15 @@ public:
 	bool contains(T data); // check for the content of an item in the list
 
 	bool is_equal(List *list); // comparing two lists
+
+	void swap(Node*, Node*);
+
+	void sortPart(int fromIndex, int toIndex, bool(*comp)(T, T));
+
+	Node* at_node(size_t index) const;
 	
+	void sort(bool(*comp)(T, T));
+
 
 	class ListIterator : public Iterator<T>
 	{
@@ -651,5 +659,59 @@ bool List<T>::isEmpty()
 
 		return false;
 
+}
+
+template <class T>
+void List<T>::swap(Node * first, Node * second)
+{
+	auto temp = first->data;
+	first->data = second->data;
+	second->data = temp;
+}
+
+template <class T>
+typename List<T>::Node* List<T>::at_node(size_t index) const
+{
+	if (index >= size) {
+		throw std::out_of_range("Index is greater than list size");
+	}
+	else {
+		size_t counter = 0;
+		Node* current = head;
+		while (counter != index) {
+			current = current->next;
+			counter++;
+		}
+		return current;
+	}
+}
+
+template <class T>
+void List<T>::sortPart(int fromIndex, int toIndex, bool(*comp)(T, T))
+{
+	if (fromIndex < toIndex)
+	{
+		const T last = this->at(toIndex);
+		int i = fromIndex - 1;
+		for (int j = fromIndex; j < toIndex; j++)
+		{
+			if (comp(this->at(j), last))
+			{
+				i++;
+				swap(this->at_node(i), this->at_node(j));
+			}
+		}
+		swap(this->at_node(toIndex), this->at_node(i + 1));
+		const int middleIndex = i + 1;
+		sortPart(fromIndex, middleIndex - 1, comp);
+		sortPart(middleIndex + 1, toIndex, comp);
+	}
+}
+
+template <class T>
+void List<T>::sort(bool(*comp)(T, T))
+{
+	const auto toIndex = size - 1;
+	sortPart(0, toIndex, comp);
 }
 

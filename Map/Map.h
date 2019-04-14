@@ -6,29 +6,35 @@ using namespace std;
 
 enum Color { R, B };
 
-template<class Key, class Value> //Key - key type, Value - value type
-struct Node
-{
+template<class Key, class Value> 
+class Node
+{ public:
 	Key key;
 	Value value;
 	bool color;
 	Node* left, *right, *parent;
+	unsigned int count;//number of inserts with value changes
 
 	Node(Key key, Value value)
 	{
 		this->key = key;
 		this->value = value;
+		this->count = 1;
 		color = R;
 		left = right = parent = nullptr;
 	}
+
+	Key getKey() { return this->key; }
+	Value getValue() { return this->value; }
+	unsigned int getCount() { return this->count; }
 };
 
-template<class Key, class Value> //Key - key type, Value - value type
+template<class Key, class Value> 
 class Map
 {
 private:
-	Node<Key, Value>* root;
-	int size;
+	Node<Key, Value>* root; 
+	size_t size;
 protected:
 	void rotateLeft(Node<Key, Value>*&);
 	void rotateRight(Node<Key, Value>*&);
@@ -68,14 +74,18 @@ protected:
 	};
 public:
 	Map() { root = nullptr; size = 0; };
-	~Map() { clear(); }
+	~Map() { 
+		//clear(); 
+	}
 	size_t getSize()
 	{
 		return size;
 	};
+	List<Node<Key, Value>*> getNodes();
 	void insert(Key key, Value value); //insert key and value to map, or replace value by key
 	void remove(Key);
 	Value find(Key); //return nullptr if not find
+	bool find(Key, Value * &);
 	bool isContainedIn(Key key);
 	void clear(); //clear whole map
 	List<Key> getKeys();
@@ -335,6 +345,7 @@ Node<Key, Value>* Map<Key, Value>::insertBST(Node<Key, Value> * root, Node<Key, 
 	}
 	else if (root->key == node->key) {
 		root->value = node->value;
+		++root->count;
 	}
 
 	return root;
@@ -477,4 +488,28 @@ List<Value> Map<Key, Value>::getValues()
 		}
 	}
 	return values;
+}
+
+template <class Key, class Value>
+bool Map<Key, Value>::find(Key key, Value * &value)
+{
+	Node<Key, Value>* temp = node_find(root, key);
+	if (temp == nullptr)
+		return false;
+	value = &temp->value;
+	return true;
+}
+
+template <class Key, class Value>
+List<Node<Key, Value>*> Map<Key, Value>::getNodes()
+{
+	List<Node<Key, Value>*> nodes;
+	if (this->getSize() != 0) {
+		auto* iterator = this->create_sft_iterator();
+		while (iterator->has_next())
+		{
+			nodes.push_back(iterator->next());
+		}
+	}
+	return nodes;
 }

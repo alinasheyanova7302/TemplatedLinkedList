@@ -15,7 +15,7 @@ namespace UnitTest2
 			Assert::IsTrue(map.getSize() == 0);
 		}
 
-		TEST_METHOD(map_insert_all_new)
+		TEST_METHOD(map_insert_all)
 		{
 			Map<int, int> map;
 			map.insert(-1, 0);
@@ -29,23 +29,7 @@ namespace UnitTest2
 				getKeys.at(2) == 1 && getValues.at(2) == 2);
 		}
 
-		TEST_METHOD(map_insert_all_exists_same)
-		{
-			Map<int, int> map;
-			map.insert(-1, 0);
-			map.insert(0, 1);
-			map.insert(1, 2);
-
-			map.insert(-1, 0);
-			map.insert(0, 1);
-			map.insert(1, 2);
-			auto getValues = map.getValues();
-			auto getKeys = map.getKeys();
-			Assert::IsTrue(map.getSize() == 3 &&
-				getKeys.at(0) == -1 && getValues.at(0) == 0 &&
-				getKeys.at(1) == 0 && getValues.at(1) == 1 &&
-				getKeys.at(2) == 1 && getValues.at(2) == 2);
-		}
+	
 
 		TEST_METHOD(map_insert_all_exists_another)
 		{
