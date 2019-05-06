@@ -134,14 +134,6 @@ namespace UnitTest3
 			Assert::IsTrue(decode_str.compare(L"гигабайт") == 0);
 		}
 
-		/*TEST_METHOD(Table_gen_diff_frequency)
-		{
-			std::wstring test_string = L"гигабайт";
-			std::wstring test_string2 = L"~гигатайд";
-			ShennonFano shennon;
-			auto table = shennon.get_table(test_string);
-			auto encode_str = shennon.encode(test_string2, table);
-			auto decode_str = shennon.decode(encode_str, table);
-		}*/
+		
 	};
 }

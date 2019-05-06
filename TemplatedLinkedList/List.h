@@ -88,6 +88,9 @@ public:
 	
 	void sort(bool(*comp)(T, T));
 
+	int indexOf(T data);
+
+	bool is_in(T data);
 
 	class ListIterator : public Iterator<T>
 	{
@@ -225,6 +228,17 @@ bool List<T>::contains(T data)
 		}
 		current = current->next;
 	} while (current != nullptr);
+	return false;
+}
+
+template <typename T>
+bool List<T>::is_in(T data) {
+	Node* node = head;
+	while (node) {
+		if (node->data == data)
+			return true;
+		node = node->next;
+	}
 	return false;
 }
 
@@ -713,5 +727,19 @@ void List<T>::sort(bool(*comp)(T, T))
 {
 	const auto toIndex = size - 1;
 	sortPart(0, toIndex, comp);
+}
+
+template <typename T>
+int List<T>::indexOf(T data)
+{
+	Node* node = head;
+	int index = 0;
+	while (node) {
+		if (node->data == data)
+			return index;
+		node = node->next;
+		index++;
+	}
+	return -1;
 }
 
