@@ -34,13 +34,13 @@ int main(int argc, char* argv[]) {
 	cout << endl << "Таблица всех маршрутов с ценами на перелет " << endl;
 	print_matrix(cities->get_size(), matrix_all_itinerary);
 	cout << endl;
-	cout << "********************************************************************************\n";
+
 
 	min_itenerary = find_min_paths(cities->get_size(), matrix_all_itinerary);
 	cout << endl << "Таблица маршрутов между городами с указанием наименьшей стоимости: " << endl;
 	print_matrix(cities->get_size(), min_itenerary);
 
-	unsigned short res = min_path("Санкт-Петербург", "Москва", matrix_all_itinerary, cities);
+	unsigned short res = min_path("Таллин", "Лондон", matrix_all_itinerary, cities);
 	std::cout << endl << res << endl;
 
 	system("PAUSE");

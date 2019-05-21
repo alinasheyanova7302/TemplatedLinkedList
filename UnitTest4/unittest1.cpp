@@ -17,7 +17,7 @@ namespace UnitTest4
 		TEST_METHOD(Vertices_num) {
 			setlocale(LC_ALL, "rus");
 			auto* vertices = new List<std::string>;
-			vector<string> strings;    //создаем вектор строк
+			vector<string> strings;    
 			string line;
 			line = "Cанкт-Петербург;Москва;10;20";
 			strings.push_back(line);

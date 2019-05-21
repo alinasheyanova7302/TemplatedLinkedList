@@ -418,9 +418,7 @@ void List<T>::pop_back()
 
 		return;
 
-	}
-
-	else {
+	} else {
 
 		Node * current = head;
 
