@@ -21,7 +21,7 @@ public:
 		this->e_flow = e_flow;
 	}
 };
-
+ //ребро 
 class Edge
 {
 public:
@@ -224,6 +224,7 @@ int Graph::getMaxFlow(int s, int t)
 	return ver.back().e_flow;
 }
 
+
 class ParsedString
 {
 public:
@@ -246,6 +247,7 @@ public:
 	}
 };
 
+//кол-вл вершин 
 vector<int> NumberOfVertices(vector<ParsedString>& parse)
 {
 	vector<int> oneVertex;
